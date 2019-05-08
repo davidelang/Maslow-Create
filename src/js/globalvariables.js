@@ -22,6 +22,7 @@ import Output from './molecules/output.js'
 import Stretch from './molecules/stretch.js'
 import Gcode from './molecules/gcode.js'
 import Code from './molecules/code.js'
+import ExtractLayout from './molecules/extractlayout.js'
 
 import GitHubModule from './githubOauth'
 
@@ -53,7 +54,8 @@ class GlobalVariables{
             union:              {creator: Union, atomType: 'Union'},
             stretch:            {creator: Stretch, atomType: 'Stretch'},
             gcode:              {creator: Gcode, atomType: 'Gcode'},
-            code:               {creator: Code, atomType: 'Code'}
+            code:               {creator: Code, atomType: 'Code'},
+            extractlayout:      {creator: ExtractLayout, atomType: 'ExtractLayout'}
         }
         this.secretTypes = {
             output:        {creator: Output, atomType: 'Output'}
