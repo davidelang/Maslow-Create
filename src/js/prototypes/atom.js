@@ -292,8 +292,7 @@ export default class Atom {
         this.draw()
     }
     
-    serialize(){
-        
+    serialize(dataObject){
         var ioValues = []
         this.children.forEach(io => {
             if (typeof io.getValue() == 'number' && io.type == 'input'){
@@ -304,6 +303,8 @@ export default class Atom {
                 ioValues.push(saveIO)
             }
         })
+        
+        dataObject.data.push({id: this.uniqueID, data: this.value.toLazyGeometry().toGeometry()})
         
         var object = {
             atomType: this.atomType,

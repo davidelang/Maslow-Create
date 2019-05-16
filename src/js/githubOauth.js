@@ -348,7 +348,17 @@ export default function GitHubModule(){
                         message: "initialize README", 
                         content: content
                     }).then(() => {
-                        intervalTimer = setInterval(() => { this.saveProject() }, 60000) //Save the project regularly
+                        //Then create the README file
+                        content = window.btoa(JSON.stringify({data:[]})) // create a file with just the word "init" in it and base64 encode it
+                        octokit.repos.createFile({
+                            owner: currentUser,
+                            repo: currentRepoName,
+                            path: "data.bin",
+                            message: "initialize data.bin", 
+                            content: content
+                        }).then(() => {
+                            intervalTimer = setInterval(() => { this.saveProject() }, 60000) //Save the project regularly
+                        })
                     })
                 })
             })
@@ -405,7 +415,9 @@ export default function GitHubModule(){
                         readmeContent = readmeContent + item + "\n\n\n"
                     })
                     
-                    const projectContent = JSON.stringify(GlobalVariables.topLevelMolecule.serialize(null), null, 4)
+                    const serialized = GlobalVariables.topLevelMolecule.serialize({data: []}, {molecules: []})
+                    const binaryContent  = JSON.stringify(serialized.data)
+                    const projectContent = JSON.stringify(serialized.project, null, 4)
                     
                     this.createCommit(octokit,{
                         owner: currentUser,
@@ -417,7 +429,8 @@ export default function GitHubModule(){
                                 'project.svg': contentSvg,
                                 'BillOfMaterials.md': bomContent,
                                 'README.md': readmeContent,
-                                'project.maslowcreate': projectContent
+                                'project.maslowcreate': projectContent,
+                                'data.bin': binaryContent
                             },
                             commit: 'Autosave'
                         }
@@ -510,18 +523,24 @@ export default function GitHubModule(){
         }).then(result => {
             
             //content will be base64 encoded
-            let rawFile = atob(result.data.content)
+            var moleculesList = JSON.parse(atob(result.data.content)).molecules
             
+            octokit.repos.getContents({
+                owner: currentUser,
+                repo: projectName,
+                path: 'data.bin'
+            }).then(result => {
+                var loadedData = JSON.parse(atob(result.data.content)).data
+                console.log(loadedData)
             
-            var moleculesList = JSON.parse(rawFile).molecules
-            
-            //Load the top level molecule from the file
-            GlobalVariables.topLevelMolecule.deserialize(moleculesList, moleculesList.filter((molecule) => { return molecule.topLevel == true })[0].uniqueID)
-            
-            GlobalVariables.topLevelMolecule.backgroundClick()
-            
-            var _this = this
-            intervalTimer = setInterval(function() { _this.saveProject() }, 60000) //Save the project regularly
+                //Load the top level molecule from the file
+                GlobalVariables.topLevelMolecule.deserialize(moleculesList, moleculesList.filter((molecule) => { return molecule.topLevel == true })[0].uniqueID)
+                
+                GlobalVariables.topLevelMolecule.backgroundClick()
+                
+                var _this = this
+                intervalTimer = setInterval(function() { _this.saveProject() }, 60000) //Save the project regularly
+            })
         })
         
     }

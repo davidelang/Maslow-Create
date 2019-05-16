@@ -239,17 +239,12 @@ export default class Molecule extends Atom{
         return generatedReadme
     }
     
-    serialize(savedObject){
+    serialize(dataObject, savedObject){
         //Save this molecule.
         
         //This one is a little confusing. Basically each molecule saves like an atom, but also creates a second object 
         //record of itself in the object "savedObject" object. If this is the topLevel molecule we need to create the 
         //savedObject object here to pass to lower levels.
-        
-        if(this.topLevel == true){
-            //If this is the top level create a new blank project to save to FIXME: It would be cleaner if this function were just called with the object when called from the top level
-            savedObject = {molecules: []}
-        }
             
         var allAtoms = [] //An array of all the atoms containted in this molecule
         var allConnectors = [] //An array of all the connectors contained in this molelcule
@@ -257,7 +252,7 @@ export default class Molecule extends Atom{
         
         this.nodesOnTheScreen.forEach(atom => {
             //Store a represnetation of the atom
-            allAtoms.push(atom.serialize(savedObject))
+            allAtoms.push(atom.serialize(dataObject,savedObject))
             //Store a representation of the atom's connectors
             atom.children.forEach(attachmentPoint => {
                 if(attachmentPoint.type == 'output'){
@@ -268,7 +263,7 @@ export default class Molecule extends Atom{
             })
         })
         
-        var thisAsObject = super.serialize(savedObject)
+        var thisAsObject = super.serialize(dataObject,savedObject)
         thisAsObject.topLevel = this.topLevel
         thisAsObject.allAtoms = allAtoms
         thisAsObject.allConnectors = allConnectors
@@ -276,14 +271,15 @@ export default class Molecule extends Atom{
         
         //Add a JSON representation of this object to the file being saved
         savedObject.molecules.push(thisAsObject)
+        dataObject.data.push({id: this.uniqueID, data: this.value.toLazyGeometry().toGeometry()})
             
         if(this.topLevel == true){
             //If this is the top level, return the complete file to be saved
-            return savedObject
+            return {project: savedObject, data: dataObject}
         }
         else{
             //If not, return a placeholder for this molecule
-            return super.serialize(savedObject)
+            return super.serialize(dataObject, savedObject)
         }
     }
         
