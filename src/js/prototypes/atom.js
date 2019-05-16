@@ -18,7 +18,7 @@ export default class Atom {
         this.color = '#F3EFEF'
         this.name = 'name'
         this.parentMolecule = null
-        this.value = GlobalVariables.api.sphere()
+        this.value = null
         this.isMoving = false
         this.x = 0
         this.y = 0

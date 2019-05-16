@@ -12,7 +12,7 @@ export default class Gcode extends Atom {
         this.name = 'Gcode'
         this.atomType = 'Gcode'
         
-        this.addIO('input', 'geometry', this, 'geometry', GlobalVariables.api.sphere())
+        this.addIO('input', 'geometry', this, 'geometry', null)
         this.addIO('input', 'tool size', this, 'number', 5.35)
         this.addIO('input', 'passes', this, 'number', 6)
         this.addIO('output', 'gcode', this, 'geometry', '')

@@ -379,10 +379,11 @@ export default function GitHubModule(){
         //Save the current project into the github repo
         if(currentRepoName != null){
             var shape = null
-            if(GlobalVariables.topLevelMolecule.value instanceof GlobalVariables.api.Shape){
+            if(typeof GlobalVariables.topLevelMolecule.value == "object"){
                 shape = GlobalVariables.topLevelMolecule.value
             }else{
                 shape = GlobalVariables.api.sphere()
+                throw "Unable to save with no output"
             }
             
             const computeSvg = async (values, key) => {
